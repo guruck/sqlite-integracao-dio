@@ -28,14 +28,16 @@ class Cliente(Base):
     __tablename__ = 'cliente'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    cpf = Column(String)
+    cpf = Column(String(11))
+    endereco = Column(String(50))
     contas: Mapped[List["Conta"]] = relationship(
         'Conta', back_populates='conta_cliente',
         cascade='all, delete-orphan'
     )
 
     def __repr__(self):
-        u_str = f'User(id={self.id}, name={self.name}, cpf={self.cpf})'
+        u_str = f'User(id={self.id}, name={self.name}, \
+            cpf={self.cpf}, endereco={self.endereco})'
         return u_str
 
     def teste(self):
@@ -80,24 +82,27 @@ with Session(engine) as session:
     tiago = Cliente(
         name='tiago',
         cpf='11111111111',
+        endereco='Rua das flores, 123',
         contas=[Conta(agencia='0001', conta='0001', saldo=100.0),
                 Conta(agencia='0001', conta='0002', saldo=150.0)]
     )
     jordino = Cliente(
         name='jordino',
         cpf='22222222222',
+        endereco='Rua das Carmelias, 321',
         contas=[Conta(agencia='0001', conta='0003'),
                 Conta(agencia='0002', conta='0001')]
     )
     maria = Cliente(
         name='maria',
         cpf='33333333333',
+        endereco='Rua da Casa Azul, 69',
         contas=[Conta(agencia='0002', conta='0002', saldo=150.0),
                 Conta(agencia='0003', conta='0001', saldo=10.0)]
     )
 
-    # session.add_all([tiago, jordino, maria])
-    # session.commit()
+    session.add_all([tiago, jordino, maria])
+    session.commit()
 
 stmt = select(Cliente).where(Cliente.name.in_(
     ['tiago', 'jordino', 'maria'])).order_by(Cliente.name.desc())
